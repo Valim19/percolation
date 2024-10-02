@@ -10,11 +10,8 @@ public class Percolation {
     private boolean[][] opened;
     private final WeightedQuickUnionUF quickUnionUF;
 
-    // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n){
-        if (n <= 0){
-            throw new IllegalArgumentException();
-        }
+        if (n <= 0) throw new IllegalArgumentException();
 
         size             = n;
         bottom           = (size * size) + 1;
@@ -23,10 +20,12 @@ public class Percolation {
         openSitesCounter = 0;
     }
 
+    private void checkException(int row, int col){
+        if (row <= 0 || row > size || col <= 0 || col > size) throw new IllegalArgumentException();
+    }
+
     public void open(int row, int col){
-        if (row <= 0 || row > size || col <= 0 || col > size) {
-            throw new IllegalArgumentException();
-        }
+        checkException(row, col);
 
         opened[row - 1][col - 1] = true;
         openSitesCounter++;
@@ -56,29 +55,26 @@ public class Percolation {
         }
     }
 
-    // is the site (row, col) open?
     public boolean isOpen(int row, int col){
-
+        checkException(row, col);
+        return opened[row - 1][col - 1];
     }
 
-    // is the site (row, col) full?
     public boolean isFull(int row, int col){
-
+        if ((row > 0 && row <= size) && (col > 0 && col <= size)){
+            return quickUnionUF.find(TOP) == quickUnionUF.find(convertBiToUnidimensional(row, col));
+        } else throw new IllegalArgumentException();
     }
 
-    // returns the number of open sites
+    private int convertBiToUnidimensional (int row, int col){
+        return size * (row - 1) + col;
+    }
+
     public int numberOfOpenSites(){
-
+        return openSitesCounter;
     }
 
-    // does the system percolate?
     public boolean percolates(){
-
-    }
-
-    // test client (optional)
-    public static void main(String[] args) {
-
+        return quickUnionUF.find(TOP) == quickUnionUF.find(bottom);
     }
 }
-
